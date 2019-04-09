@@ -41,14 +41,9 @@ for i=1:num_frames
   end
   
   % project all keyframes points in the most recent keyframe
-  for j = 1: window.maxFrameIdx-1
-   % make rkhs registration object
-    dvo = rgbd_dvo();
-    dvo.set_ptclouds(window.keyFrame{window.maxFrameIdx}, window.keyFrame{j});
-    dvo.align();
-    tform = dvo.tform;
-
-  end
+  for j = 1: window.maxFrameIdx
+      
+  
   
 end
 % compare poses to GT and plot results
