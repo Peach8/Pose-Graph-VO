@@ -6,6 +6,11 @@
 %   back-end
 %   save pose
 % end loop
+
+% ============================================
+% WINDOW STRUCT
+% ============================================
+
 global window
 max_num_keyframes = 7;
 
@@ -13,42 +18,69 @@ max_num_keyframes = 7;
 window.keyframes = cell(1, max_num_keyframes);
 % Specify the maximum index of frames
 window.maxFrameIdx = 1;
+% Dictionary of active points and their locations in each frame
+%   KeyType - index of active point
+%   ValueType - [(x_1, y_1), (x_2, y_2), ...] (location of active point
+%       in each frame, where (x_n, y_n) is the location of the active point
+%       in frame n. If (x, y) = (-1, 1), then active point not
+%       observable in the frame.
+window.activePoints = containers.Map('KeyType', 'int32', 'ValueType', 'Any');
+% Array of transformation matrices
+window.transformMatrices = cell(1, max_num_keyframes);
 
+% ============================================
+% FRAME STRUCT (an element of window)
+% ============================================
 
-global frames
-num_frames = 20;
-frames = cell(1, num_frames);
-
-for i=1:num_frames
-    % RGB values
-    frames{i}.Color = uw_livingRoomData{i}.Color;
-    % XYZ values
-    frames{i}.ptclound = findCandidatePoints(uw_livingRoomData{i}.Location);% need to be implemented
+% Create elements for every frame
+num_candidate_points = 2000;
+for i=1:max_num_keyframes
+    % Storing candidate points in a cell array. The cell array must be
+    % ordered by minimum distance to active points (as mentioned in
+    % the Google Doc). Each element of this array is a 1 x 2 double
+    % array [x_1, y_1], where (x_1, y_1) is the x, y position of the
+    % candidate point in the frame.
+    window.keyframes{i}.candidatePoints = cell(1, num_candidate_points);
+    % distanceToPrevious will hold the frame's distance to
+    % the previous frame
+    window.keyframes{i}.distanceToPrevious = 0;
 end
 
-% feedin frame by frame
-for i=1:num_frames
-  %decide if a frame could be a keyframe  
-  if (i==1 || i==2)
-      window.keyframes{window.maxFrameIdx} = frames{i};
-      window.maxFrameIdx = window.maxFrameIdx +1;
-      continue;
-  end
-  
-  if isKeyFrame(frames{i})%need to be implemented
-      window.keyframes{window.maxFrameIdx} = frames{i};
-      window.maxFrameIdx = window.maxFrameIdx +1;
-  end
-  
-  % project all keyframes points in the most recent keyframe
-  for j = 1: window.maxFrameIdx-1
-   % make rkhs registration object
-    dvo = rgbd_dvo();
-    dvo.set_ptclouds(window.keyFrame{window.maxFrameIdx}, window.keyFrame{j});
-    dvo.align();
-    tform = dvo.tform;
+% ============================================
 
-  end
+% feeding frame by frame
+for i=1:num_frames
+    %decide if a frame could be a keyframe  
+    if i == 1
+        window.keyframes{window.maxFrameIdx}.candidatePoints = ...
+            findCandidatePoints(uw_livingRoomData{i}.Location);
+        window.maxFrameIdx = window.maxFrameIdx +1;
+    elseif i == 2
+        window.keyframes{window.maxFrameIdx}.candidatePoints = ...
+            findCandidatePoints(uw_livingRoomData{i}.Location);
+        window.keyframes{window.maxFrameIdx}.distanceToPrevious = ...
+            distanceBetweenFrames(window.maxFrameIdx + 1,...
+                                  window.maxFrameIdx); % will be implemented
+        window.maxFrameIdx = window.maxFrameIdx + 1;
+    else
+        if isKeyFrame(frames{i}) %need to be implemented
+            window.keyframes{window.maxFrameIdx}.candidatePoints = ...
+                findCandidatePoints(uw_livingRoomData{i}.Location);
+            window.keyframes{window.maxFrameIdx}.distanceToPrevious = ...
+                distanceBetweenFrames(window.maxFrameIdx + 1,...
+                                      window.maxFrameIdx);
+            window.maxFrameIdx = window.maxFrameIdx +1;
+        end
+    end
+  
+    % project all keyframes points in the most recent keyframe
+    for j = 1:window.maxFrameIdx-1
+        % make rkhs registration object
+        dvo = rgbd_dvo();
+        dvo.set_ptclouds(window.keyFrame{window.maxFrameIdx}, window.keyFrame{j});
+        dvo.align();
+        tform = dvo.tform;
+    end
   
 end
 % compare poses to GT and plot results
