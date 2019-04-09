@@ -25,8 +25,8 @@ window.maxFrameIdx = 1;
 %       in frame n. If (x, y) = (-1, 1), then active point not
 %       observable in the frame.
 window.activePoints = containers.Map('KeyType', 'int32', 'ValueType', 'Any');
-% Array of transformation matrices
-window.transformMatrices = cell(1, max_num_keyframes);
+% Array of transformation matrices'
+window.transform = cell(max_num_keyframes, max_num_keyframes);
 
 % ============================================
 % FRAME STRUCT (an element of window)
@@ -73,14 +73,21 @@ for i=1:num_frames
         end
     end
   
-    % project all keyframes points in the most recent keyframe
-    for j = 1:window.maxFrameIdx-1
+    % calculate transformation from each keyframe to all other keyframes
+    for j = 1: window.maxFrameIdx
         % make rkhs registration object
-        dvo = rgbd_dvo();
-        dvo.set_ptclouds(window.keyFrame{window.maxFrameIdx}, window.keyFrame{j});
-        dvo.align();
-        tform = dvo.tform;
+        for k = (j+1) : window.maxFrameIdx
+            dvo = rgbd_dvo();
+            dvo.set_ptclouds(window.keyFrame{k}, window.keyFrame{j});
+            dvo.align();
+            window.transform{j,k} = dvo.tform; % Store transformation matrices between frames
+        end
     end
+    
+  % choose candidate points
   
+  % send to back end to optimize
+  
+  % choose keyframe to marginalzie
 end
 % compare poses to GT and plot results
