@@ -13,7 +13,7 @@ max_num_keyframes = 7;
 window.keyframes = cell(1, max_num_keyframes);
 % Specify the maximum index of frames
 window.maxFrameIdx = 1;
-
+window.transform = cell(max_num_keyframes,max_num_keyframes);
 
 global frames
 num_frames = 20;
@@ -38,17 +38,25 @@ for i=1:num_frames
   if isKeyFrame(frames{i})%need to be implemented
       window.keyframes{window.maxFrameIdx} = frames{i};
       window.maxFrameIdx = window.maxFrameIdx +1;
+  else 
+      continue;
   end
   
-  % project all keyframes points in the most recent keyframe
-  for j = 1: window.maxFrameIdx-1
+  % calculate transformation from each keyframe to all other keyframes
+  for j = 1: window.maxFrameIdx
    % make rkhs registration object
-    dvo = rgbd_dvo();
-    dvo.set_ptclouds(window.keyFrame{window.maxFrameIdx}, window.keyFrame{j});
-    dvo.align();
-    tform = dvo.tform;
-
+    for k = (j+1) : window.maxFrameIdx
+        dvo = rgbd_dvo();
+        dvo.set_ptclouds(window.keyFrame{k}, window.keyFrame{j});
+        dvo.align();
+        window.transform{j,k} = dvo.tform; % Store transformation matrices between frames
+    end
   end
   
+  % choose candidate points
+  
+  % send to back end to optimize
+  
+  % choose keyframe to marginalzie
 end
 % compare poses to GT and plot results
