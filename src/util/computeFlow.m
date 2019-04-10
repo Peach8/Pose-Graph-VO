@@ -15,9 +15,10 @@ function flow = computeFlow(tform)
             prevFrame_xyz = prevFrame(i,j,:);
             
             nextFrame_xyz = tform*[prevFrame_xyz(1), prevFrame_xyz(2), prevFrame_xyz(3), 1]';
-            flow = flow + sqrt((prevFrame_xyz(1) - nextFrame_xyz(1))^2 + ...
-                               (prevFrame_xyz(2) - nextFrame_xyz(2))^2 + ...
-                               (prevFrame_xyz(3) - nextFrame_xyz(3))^3);
+            flow = flow + sqrt((prevFrame_xyz - nextFrame_xyz).^2);
+%             flow = flow + sqrt((prevFrame_xyz(1) - nextFrame_xyz(1))^2 + ...
+%                                (prevFrame_xyz(2) - nextFrame_xyz(2))^2 + ...
+%                                (prevFrame_xyz(3) - nextFrame_xyz(3))^3);
         end
     end
     
