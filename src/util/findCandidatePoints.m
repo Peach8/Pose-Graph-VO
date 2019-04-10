@@ -1,4 +1,4 @@
-function [features, points] = findCandidatePoints(rgb_image);
+function [features, points] = findCandidatePoints(rgb_image)
     im = rgb2gray(rgb_image);
     points = detectSURFFeatures(im);
     % extractFeatures returns [features, points]
