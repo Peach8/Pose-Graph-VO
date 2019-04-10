@@ -71,11 +71,6 @@ for i=1:num_frames
             window.transform{j,k} = dvo.tform; % Store transformation matrices between frames
         end
     end
-    
-  % choose candidate points
-  
-  % send to back end to optimize
-  
-  % choose keyframe to marginalzie
+
 end
 % compare poses to GT and plot results
