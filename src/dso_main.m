@@ -37,11 +37,11 @@ for i=1:num_frames
         % findCandidatePoints -> SIFT
         window.maxFrameIdx = window.maxFrameIdx + 1;
         window.keyframes{window.maxFrameIdx}.candidatePoints = ...
-            findCandidatePoints(freiburg{i}.Color);
+            findCandidatePoints(freiburg{i}.Color, window.maxFrameIdx);
         % Store the frame index (to access corresponding point cloud)
         window.keyframes{window.maxFrameIdx}.frameIdx = i;
     else
-        if isKeyFrame() %need to be implemented
+        if isKeyFrame(i) %need to be implemented
             % -- These 2 lines should be in isKeyFrame()
             %window.maxFrameIdx = window.maxFrameIdx + 1;
             %window.keyframes{window.maxFrameIdx}.candidatePoints = ...
