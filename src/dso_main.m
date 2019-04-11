@@ -6,14 +6,14 @@
 %   back-end
 %   save pose
 % end loop
-
+global poses;
 % ============================================
 % WINDOW STRUCT
 % ============================================
 
 global window
 max_num_keyframes = 3;
-
+window.num_keyframes = 0;
 % Holds a cell array of frame structs
 window.keyframes = cell(1, max_num_keyframes);
 window.maxFrameIdx = 0;
@@ -22,7 +22,12 @@ window.maxFrameIdx = 0;
 %   - Index 2 -> matrix between 2 and 3
 %   - Index 3 -> matrix between 1 and 3
 window.transform = cell(1, max_num_keyframes);
-window.flowThresh = 50;
+% Threshold must be < 0.5647 (0.3 works well)
+window.flowThresh = 0.3;
+% There must be at least 20 non-outlier matches
+% between keyframes
+window.minNumMatches = 20;
+window.minimum = 400;
 
 % ============================================
 % FRAME STRUCT (an element of window)
@@ -32,12 +37,14 @@ window.flowThresh = 50;
 % ============================================
 
 % feeding frame by frame
-global freiburg2;
-freiburg2 = load('freiburg2.mat');
-freiburg2 = freiburg2.freiburg2;
-num_frames = 20;
+%global freiburg2;
+%freiburg2 = load('freiburg2_500.mat');
+%freiburg2 = freiburg2.freiburg2;
+num_frames = 500;
+% The poses array will store all camera poses over the trajectory
+poses = cell(1, num_frames);
 for i=1:num_frames
-    %decide if a frame could be a keyframe  
+    %decide if a frame could be a keyframe
     if i == 1 
         % findCandidatePoints -> SIFT
         window.maxFrameIdx = window.maxFrameIdx + 1;
@@ -59,7 +66,42 @@ for i=1:num_frames
     
     % If three frames are in window, marginalize the oldest one
     if window.maxFrameIdx == max_num_keyframes
-        window.transform{3} = window.transform{1} * window.transform{2};
+        window.num_keyframes = window.num_keyframes + 1;
+        features = window.keyframes{window.maxFrameIdx}.candidatePoints.features;
+        points = window.keyframes{window.maxFrameIdx}.candidatePoints.points;
+        keyframe_features = window.keyframes{window.maxFrameIdx - 2}.candidatePoints.features;
+        keyframe_points = window.keyframes{window.maxFrameIdx - 2}.candidatePoints.points;
+        index_pair = matchFeatures(features, keyframe_features);
+        matchedPoints_frame = points(index_pair(:, 1));
+        matchedPoints_keyframe = keyframe_points(index_pair(:, 2));
+        frame_idx = window.keyframes{window.maxFrameIdx}.frameIdx;
+        key_idx = window.keyframes{window.maxFrameIdx - 2}.frameIdx;
+      
+        [~, in_dist, in_orig] = estimateGeometricTransform(...
+            matchedPoints_frame, matchedPoints_keyframe, 'similarity');
+        
+        loc_frame = round(in_dist.Location);
+        loc_keyframe = round(in_orig.Location);
+        % Construct point cloud using location of matched_points
+        ptcloud_frame = zeros(size(loc_frame, 1), 3);
+        ptcloud_keyframe = zeros(size(loc_keyframe, 1), 3);
+   
+        for j=1:size(loc_frame, 1)
+            ptcloud_frame(j, :) = freiburg2{frame_idx}.Location(...
+                loc_frame(j, 2), loc_frame(j, 1), :);
+            ptcloud_keyframe(j, :) = freiburg2{key_idx}.Location(...
+                loc_keyframe(j, 2), loc_keyframe(j, 1), :);
+        end
+        
+        rows_nan_frame = any(isnan(ptcloud_frame'));
+        rows_nan_keyframe = any(isnan(ptcloud_keyframe'));
+        rows_remove = rows_nan_frame | rows_nan_keyframe;
+        ptframe = ptcloud_frame(~rows_remove, :);
+        ptkey = ptcloud_keyframe(~rows_remove, :);
+        % Compute initial transformation matrix between point clouds
+        % from keyframe to frame
+        tform = findInitailTform(ptframe, ptkey);
+        window.transform{3} = tform;
         back_end();
         window.keyframes(1:2) = window.keyframes(2:3);
         window.maxFrameIdx = window.maxFrameIdx - 1;
