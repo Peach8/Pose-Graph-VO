@@ -37,13 +37,19 @@ window.minimum = 400;
 % ============================================
 
 % feeding frame by frame
-%global freiburg2;
-%freiburg2 = load('freiburg2_500.mat');
-%freiburg2 = freiburg2.freiburg2;
+global freiburg2;
+freiburg2 = load('freiburg2_500.mat');
+freiburg2 = freiburg2.freiburg2;
 num_frames = 500;
-% The poses array will store all camera poses over the trajectory
+% The poses array will store all camera poses over the trajectory.
+% The first pose will simply be the identity matrix.
 poses = cell(1, num_frames);
+poses{1} = eye(4);
+
+% Counter to place poses in the right index
+counter = 1;
 for i=1:num_frames
+    i
     %decide if a frame could be a keyframe
     if i == 1 
         % findCandidatePoints -> SIFT
@@ -102,7 +108,18 @@ for i=1:num_frames
         % from keyframe to frame
         tform = findInitailTform(ptframe, ptkey);
         window.transform{3} = tform;
-        back_end();
+        
+        % Run joint optimization
+        poseGraph = cell(1, max_num_keyframes);
+        poseGraph{1} = [1, 2]; poseGraph{2} = [2, 3]; poseGraph{3} = [1, 3];
+        optimized_tforms = joint_optimization(window.transform,  poseGraph);
+        
+        % Place transforms from 1-2 and 2-3 in poses
+        poses{counter + 1} = poses{counter} * optimized_tforms{1};
+        poses{counter + 2} = poses{counter + 1} * optimized_tforms{2};
+        counter = counter + 1;
+        
+        window.transform = optimized_tforms;
         window.keyframes(1:2) = window.keyframes(2:3);
         window.maxFrameIdx = window.maxFrameIdx - 1;
         window.transform{1} = window.transform{window.maxFrameIdx};

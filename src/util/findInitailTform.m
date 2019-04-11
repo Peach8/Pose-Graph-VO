@@ -1,4 +1,4 @@
-function tform=findInitialTform(pc1, pc2)
+function tform=findInitailTform(pc1, pc2)
 
 mupc1 = mean(pc1, 1);
 mupc2 = mean(pc2, 1);
