@@ -1,4 +1,4 @@
-function jointTwist = joint_optimization(Z, Keys)
+function jointPose = joint_optimization(Z, Keys)
 % input: Z is from DVO, twist between 1-2, 2-3, 1-3
 % output: twist between connected nodes in a window
 
@@ -66,7 +66,9 @@ while iter < max_iter
     end
 end
 
-jointTwist = T_est;
+% pose is not the same as twist!
+% pose{1} = eye, pose{2} = tf(1->2), pos{3} = tf(1->3)
+jointPose = T_est;
 
 end
 

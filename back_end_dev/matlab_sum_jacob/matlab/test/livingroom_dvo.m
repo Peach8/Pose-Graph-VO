@@ -120,7 +120,7 @@ imshow(ptCloudRef.Color)
 dvo = rgbd_dvo();
 % percen = 0.05;
 % for gridSize = 0.04:-0.002:0.009
-for percen = 0.05:0.02:0.7
+for percen = 0.05:0.02:0.2
     % downsample point clouds using grids
     fixed = [];
     fixed.ptcloud = removeInvalidPoints(pcdownsample(ptCloudRef, 'random', percen));
