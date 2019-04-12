@@ -66,7 +66,7 @@ while iter < max_iter
     end
 end
 
-jointTwist = Z_est;
+jointTwist = T_est;
 
 end
 
