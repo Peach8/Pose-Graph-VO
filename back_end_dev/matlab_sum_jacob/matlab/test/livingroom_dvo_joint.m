@@ -4,7 +4,7 @@ clc; clear; close all
 
 %% load point cloud
 freiburg2 = load('freiburg2.mat');
-freiburg2 = freiburg2.freiburg2(1:8);
+freiburg2 = freiburg2.freiburg2(13:15);
 
 POSE = cell(length(freiburg2),1);
 POSE{1} = eye(4);
