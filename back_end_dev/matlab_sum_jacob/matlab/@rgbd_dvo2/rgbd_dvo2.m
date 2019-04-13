@@ -9,7 +9,7 @@ classdef rgbd_dvo2 < handle
         fixed_image;            % fixed frame intensity image
         imgrad;                 % image intensity gradient
         gradI;                  % intensity gradient
-        MAX_ITER = 2000;        % maximum number of iteration
+        MAX_ITER = 300;        % maximum number of iteration
         % The program stops if norm(omega)+norm(v) < eps
         eps = 1e-4;
         eps_2 = 1e-4;

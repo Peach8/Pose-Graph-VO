@@ -9,7 +9,7 @@ classdef rgbd_dvo3 < handle
         fixed_image;            % fixed frame intensity image
         imgrad;                 % image intensity gradient
         gradI;                  % intensity gradient
-        MAX_ITER = 2000;        % maximum number of iteration
+        MAX_ITER = 100;        % maximum number of iteration
         % The program stops if norm(omega)+norm(v) < eps
         eps = 2e-4;
         eps_2 = 2e-4;
@@ -90,7 +90,6 @@ classdef rgbd_dvo3 < handle
                 warning('The inputs are ignored!');
             end
             obj.Kf = [];
-            obj.tform = affine3d([obj.R, obj.T; 0, 0, 0, 1]');
         end
         
         function set_ptclouds(obj, target, source, varargin)

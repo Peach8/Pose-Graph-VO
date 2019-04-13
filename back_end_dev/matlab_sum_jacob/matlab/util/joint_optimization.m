@@ -3,7 +3,8 @@ function jointPose = joint_optimization(Z, Keys)
 % output: twist between connected nodes in a window
 
 % measurement noise covariance
-Sigma = diag([0.05^2, 0.03^2, 0.03^2, 0.05^2, 0.05^2, 0.05^2]);
+% Sigma = diag([0.05^2, 0.03^2, 0.03^2, 0.05^2, 0.05^2, 0.05^2]);
+Sigma = eye(6);
 % Cholesky factor of covariance for sampling
 Lz = chol(Sigma, 'lower');
 
@@ -18,12 +19,12 @@ A = zeros(6 + 6 * length(Z), 6 * length(T_init));
 b = zeros(6 + 6 * length(Z),1);
 % anchor node covariance; we want to fix the node so the covariance should
 % be small. This will result in large weights in the optimization process.
-Sigma_init = eye(6) * 0.1^2;
-A(1:6,1:6) = chol(Sigma_init, 'lower') \ eye(6);
+% Sigma_init = eye(6) * 0.1^2;
+% A(1:6,1:6) = chol(Sigma_init, 'lower') \ eye(6);
+A(1:6,1:6) = eye(6);
 
 % Gauss-Newton solver over SE(3)
 T_est = T_init;
-Z_est = Z;
 max_iter = 100;
 iter = 0;
 eps_Jr = 1e-9;
