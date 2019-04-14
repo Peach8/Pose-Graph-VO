@@ -1,8 +1,25 @@
 function [isKey] = isKeyFrame(frame_idx)
     global window;
     global freiburg2;
+    
+   if frame_idx == 115
+       disp('here')
+   end
+    
     % Get SURF features and points
     [features, points] = findCandidatePoints(freiburg2{frame_idx}.Color);
+    
+    loc_frame = round(points.Location);
+    
+    ptcloud_frame = zeros(size(points.Location, 1), 3);
+    for i=1:size(points, 1)
+        ptcloud_frame(i, :) = freiburg2{frame_idx}.Location(...
+            loc_frame(i, 2), loc_frame(i, 1), :);
+    end
+    rows_nan_frame = any(isnan(ptcloud_frame'));
+    features = features(~rows_nan_frame, :);
+    points = points(~rows_nan_frame, :);
+    
     keyframe_features = ...
         window.keyframes{window.maxFrameIdx}.candidatePoints.features;
     keyframe_points = ...
@@ -53,14 +70,14 @@ function [isKey] = isKeyFrame(frame_idx)
         ptcloud_keyframe(i, :) = freiburg2{key_idx}.Location(...
             loc_keyframe(i, 2), loc_keyframe(i, 1), :);
     end
-    rows_nan_frame = any(isnan(ptcloud_frame'));
-    rows_nan_keyframe = any(isnan(ptcloud_keyframe'));
-    rows_remove = rows_nan_frame | rows_nan_keyframe;
-    ptframe = ptcloud_frame(~rows_remove, :);
-    ptkey = ptcloud_keyframe(~rows_remove, :);
+%     rows_nan_frame = any(isnan(ptcloud_frame'));
+%     rows_nan_keyframe = any(isnan(ptcloud_keyframe'));
+%     rows_remove = rows_nan_frame | rows_nan_keyframe;
+%     ptframe = ptcloud_frame(~rows_remove, :);
+%     ptkey = ptcloud_keyframe(~rows_remove, :);
     % Compute initial transformation matrix between point clouds
     % from keyframe to frame
-    tform = findInitailTform(ptframe, ptkey);
+    tform = findInitailTform(ptcloud_frame, ptcloud_keyframe);
     
     %a = tform * [ptframe'; ones(1, size(ptframe, 1))];
     %b = [ptkey'; ones(1, size(ptframe, 1))];
@@ -71,19 +88,19 @@ function [isKey] = isKeyFrame(frame_idx)
     %scatter3(b(1, :), b(2, :), b(3, :));
     %c = (b-a).^2;
     
-    if size(ptkey, 1) < window.minimum
-        window.minimum = size(ptkey, 1);
+    if size(ptcloud_keyframe, 1) < window.minimum
+        window.minimum = size(ptcloud_keyframe, 1);
     end
     flow = 0;
     % Compute flow
-    if size(ptkey, 1) >= window.minNumMatches
-        flow = computeFlow(ptkey(1:window.minNumMatches, :), ptframe(1:window.minNumMatches, :));
+    if size(ptcloud_keyframe, 1) >= window.minNumMatches
+        flow = computeFlow(ptcloud_keyframe(1:window.minNumMatches, :), ptcloud_frame(1:window.minNumMatches, :));
     end
     % Check if flow is greater than a set threshold
-    if flow > window.flowThresh || (size(ptkey, 1) < window.minNumMatches)
+    if flow > window.flowThresh || (size(ptcloud_keyframe, 1) < window.minNumMatches)
         % If flow is greater, add frame to window and store initial guess
         window.maxFrameIdx = window.maxFrameIdx + 1;
-        window.transform{window.maxFrameIdx - 1} = tform.T';
+        window.transform{window.maxFrameIdx - 1} = tform;
         window.keyframes{window.maxFrameIdx}.candidatePoints.features = features;
         window.keyframes{window.maxFrameIdx}.candidatePoints.points = points;
         window.keyframes{window.maxFrameIdx}.frameIdx = frame_idx;

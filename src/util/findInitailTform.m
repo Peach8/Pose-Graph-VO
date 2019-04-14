@@ -1,11 +1,10 @@
 function tform=findInitailTform(pc1, pc2)
 
-[~, ~, transform] = procrustes(pc1, pc2);
-trans = mean(transform.c, 1);
-A = [transform.T', trans';
-    0 0 0 1];
-tform = affine3d(A');
-%{
+% [~, ~, transform] = procrustes(pc1, pc2, 'scaling', false, 'reflection', false);
+% trans = mean(transform.c, 1);
+% tform = [transform.T', trans';
+%     0 0 0 1];
+
 mupc1 = mean(pc1, 1);
 mupc2 = mean(pc2, 1);
 
@@ -19,8 +18,9 @@ T = (mupc1 - mupc2);
 
 A = [R',    T';
      0 0 0 1];
-tform = affine3d(A');
-%}
+tform = A;
+% tform = affine3d(A');
+
 
 %tform = A;
 

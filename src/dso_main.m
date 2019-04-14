@@ -26,7 +26,7 @@ window.transform = cell(1, max_num_keyframes);
 window.flowThresh = 0.1;
 % There must be at least 20 non-outlier matches
 % between keyframes
-window.minNumMatches = 30;
+window.minNumMatches = 120;
 window.minimum = 400;
 
 % ============================================
@@ -38,8 +38,8 @@ window.minimum = 400;
 
 % feeding frame by frame
 global freiburg2;
-freiburg2 = load('freiburg2.mat');
-freiburg2 = freiburg2.freiburg2;
+% freiburg2 = load('freiburg2.mat');
+% freiburg2 = freiburg2.freiburg2;
 num_frames = 500;
 % The poses array will store all camera poses over the trajectory.
 % The first pose will simply be the identity matrix.
@@ -55,6 +55,18 @@ for i=1:num_frames
         % findCandidatePoints -> SIFT
         window.maxFrameIdx = window.maxFrameIdx + 1;
         [feat, points] = findCandidatePoints(freiburg2{i}.Color);
+        
+        loc_frame = round(points.Location);    
+        
+        ptcloud_frame = zeros(size(points.Location, 1), 3);
+        for j=1:size(points, 1)
+            ptcloud_frame(j, :) = freiburg2{i}.Location(...
+                loc_frame(j, 2), loc_frame(j, 1), :);
+        end
+        rows_nan_frame = any(isnan(ptcloud_frame'));
+        feat = feat(~rows_nan_frame, :);
+        points = points(~rows_nan_frame, :);
+        
         window.keyframes{window.maxFrameIdx}.candidatePoints.features = feat;
         window.keyframes{window.maxFrameIdx}.candidatePoints.points = points;
         % Store the frame index (to access corresponding point cloud)
@@ -84,7 +96,7 @@ for i=1:num_frames
         key_idx = window.keyframes{window.maxFrameIdx - 2}.frameIdx;
       
         [~, in_dist, in_orig] = estimateGeometricTransform(...
-            matchedPoints_frame, matchedPoints_keyframe, 'affine');
+            matchedPoints_frame, matchedPoints_keyframe, 'similarity');
         
         loc_frame = round(in_dist.Location);
         loc_keyframe = round(in_orig.Location);
@@ -107,7 +119,11 @@ for i=1:num_frames
         % Compute initial transformation matrix between point clouds
         % from keyframe to frame
         tform = findInitailTform(ptframe, ptkey);
-        window.transform{3} = tform.T';
+        window.transform{3} = tform;
+        
+        det(window.transform{1})
+        det(window.transform{2})
+        det(window.transform{3})
         
         % Run joint optimization
         poseGraph = cell(1, max_num_keyframes);
