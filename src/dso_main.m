@@ -23,10 +23,10 @@ window.maxFrameIdx = 0;
 %   - Index 3 -> matrix between 1 and 3
 window.transform = cell(1, max_num_keyframes);
 % Threshold must be < 0.5647 (0.3 works well)
-window.flowThresh = 0.3;
+window.flowThresh = 0.1;
 % There must be at least 20 non-outlier matches
 % between keyframes
-window.minNumMatches = 20;
+window.minNumMatches = 30;
 window.minimum = 400;
 
 % ============================================
@@ -38,7 +38,7 @@ window.minimum = 400;
 
 % feeding frame by frame
 global freiburg2;
-freiburg2 = load('freiburg2_500.mat');
+freiburg2 = load('freiburg2.mat');
 freiburg2 = freiburg2.freiburg2;
 num_frames = 500;
 % The poses array will store all camera poses over the trajectory.
@@ -84,7 +84,7 @@ for i=1:num_frames
         key_idx = window.keyframes{window.maxFrameIdx - 2}.frameIdx;
       
         [~, in_dist, in_orig] = estimateGeometricTransform(...
-            matchedPoints_frame, matchedPoints_keyframe, 'similarity');
+            matchedPoints_frame, matchedPoints_keyframe, 'affine');
         
         loc_frame = round(in_dist.Location);
         loc_keyframe = round(in_orig.Location);
@@ -107,7 +107,7 @@ for i=1:num_frames
         % Compute initial transformation matrix between point clouds
         % from keyframe to frame
         tform = findInitailTform(ptframe, ptkey);
-        window.transform{3} = tform;
+        window.transform{3} = tform.T';
         
         % Run joint optimization
         poseGraph = cell(1, max_num_keyframes);

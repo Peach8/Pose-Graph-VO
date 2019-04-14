@@ -13,7 +13,7 @@ function [isKey] = isKeyFrame(frame_idx)
     matchedPoints_keyframe = keyframe_points(index_pair(:, 2));
     % Get index of most recent keyframe
     key_idx = window.keyframes{window.maxFrameIdx}.frameIdx;
-    if frame_idx == 53
+    if frame_idx == 100
         figure;
         imshow(freiburg2{frame_idx}.Color); hold on;
         scatter(points.Location(:, 1), points.Location(:, 2)); hold off;
@@ -27,11 +27,11 @@ function [isKey] = isKeyFrame(frame_idx)
     
     % MUST UNCOMMENT
     [~, in_dist, in_orig] = estimateGeometricTransform(...
-        matchedPoints_frame, matchedPoints_keyframe, 'similarity');
+        matchedPoints_frame, matchedPoints_keyframe, 'affine');
     %in_dist = matchedPoints_frame;
     %in_orig = matchedPoints_keyframe;
    
-    if frame_idx == 53
+    if frame_idx == 100
         figure;
         showMatchedFeatures(freiburg2{frame_idx}.Color,freiburg2{key_idx}.Color...
             , in_dist, in_orig)
@@ -83,10 +83,10 @@ function [isKey] = isKeyFrame(frame_idx)
     if flow > window.flowThresh || (size(ptkey, 1) < window.minNumMatches)
         % If flow is greater, add frame to window and store initial guess
         window.maxFrameIdx = window.maxFrameIdx + 1;
-        window.transform{window.maxFrameIdx - 1} = tform;
+        window.transform{window.maxFrameIdx - 1} = tform.T';
         window.keyframes{window.maxFrameIdx}.candidatePoints.features = features;
         window.keyframes{window.maxFrameIdx}.candidatePoints.points = points;
-        window.keyframes{window.maxFrameIdx}.frameIdx = i;
+        window.keyframes{window.maxFrameIdx}.frameIdx = frame_idx;
         isKey = true;
     else
         isKey = false;
