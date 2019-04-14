@@ -166,6 +166,8 @@ for i = 1:20
     Y(i) = COORD{i}(2);
     Z(i) = COORD{i}(3);
 end
+
+
 figure(4)
 plot3(X,Y,Z)
 hold on
