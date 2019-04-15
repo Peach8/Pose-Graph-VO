@@ -23,10 +23,11 @@ window.maxFrameIdx = 0;
 %   - Index 3 -> matrix between 1 and 3
 window.transform = cell(1, max_num_keyframes);
 % Threshold must be < 0.5647 (0.3 works well)
-window.flowThresh = 0.1;
+window.flowThresh = 0.2;
 % There must be at least 20 non-outlier matches
 % between keyframes
 window.minNumMatches = 120;
+%window.minNumMatches = 100;
 window.minimum = 400;
 
 % ============================================
@@ -38,9 +39,9 @@ window.minimum = 400;
 
 % feeding frame by frame
 global freiburg2;
-% freiburg2 = load('freiburg2.mat');
-% freiburg2 = freiburg2.freiburg2;
-num_frames = 500;
+freiburg2 = load('freiburg2.mat');
+freiburg2 = freiburg2.freiburg2;
+num_frames = 366;
 % The poses array will store all camera poses over the trajectory.
 % The first pose will simply be the identity matrix.
 poses = cell(1, num_frames);
@@ -96,7 +97,7 @@ for i=1:num_frames
         key_idx = window.keyframes{window.maxFrameIdx - 2}.frameIdx;
       
         [~, in_dist, in_orig] = estimateGeometricTransform(...
-            matchedPoints_frame, matchedPoints_keyframe, 'similarity');
+            matchedPoints_frame, matchedPoints_keyframe, 'projective');
         
         loc_frame = round(in_dist.Location);
         loc_keyframe = round(in_orig.Location);
@@ -110,25 +111,31 @@ for i=1:num_frames
             ptcloud_keyframe(j, :) = freiburg2{key_idx}.Location(...
                 loc_keyframe(j, 2), loc_keyframe(j, 1), :);
         end
-        
+        %{
         rows_nan_frame = any(isnan(ptcloud_frame'));
         rows_nan_keyframe = any(isnan(ptcloud_keyframe'));
         rows_remove = rows_nan_frame | rows_nan_keyframe;
         ptframe = ptcloud_frame(~rows_remove, :);
         ptkey = ptcloud_keyframe(~rows_remove, :);
+        %}
         % Compute initial transformation matrix between point clouds
         % from keyframe to frame
-        tform = findInitailTform(ptframe, ptkey);
+        tform = findInitailTform(ptcloud_frame, ptcloud_keyframe);
         window.transform{3} = tform;
         
         det(window.transform{1})
         det(window.transform{2})
         det(window.transform{3})
         
+        if det(window.transform{3}) < 0.99
+            display("here")
+        end
+        
         % Run joint optimization
         poseGraph = cell(1, max_num_keyframes);
         poseGraph{1} = [1, 2]; poseGraph{2} = [2, 3]; poseGraph{3} = [1, 3];
         optimized_tforms = joint_optimization(window.transform,  poseGraph);
+        tform = findInitailTform(ptcloud_frame, ptcloud_keyframe);
         
         % Place transforms from 1-2 and 2-3 in poses
         poses{counter + 1} = poses{counter} * optimized_tforms{1};

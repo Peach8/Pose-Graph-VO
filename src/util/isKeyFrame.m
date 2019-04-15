@@ -2,10 +2,6 @@ function [isKey] = isKeyFrame(frame_idx)
     global window;
     global freiburg2;
     
-   if frame_idx == 115
-       disp('here')
-   end
-    
     % Get SURF features and points
     [features, points] = findCandidatePoints(freiburg2{frame_idx}.Color);
     
@@ -30,6 +26,7 @@ function [isKey] = isKeyFrame(frame_idx)
     matchedPoints_keyframe = keyframe_points(index_pair(:, 2));
     % Get index of most recent keyframe
     key_idx = window.keyframes{window.maxFrameIdx}.frameIdx;
+    %{
     if frame_idx == 100
         figure;
         imshow(freiburg2{frame_idx}.Color); hold on;
@@ -41,18 +38,21 @@ function [isKey] = isKeyFrame(frame_idx)
         showMatchedFeatures(freiburg2{frame_idx}.Color, freiburg2{key_idx}.Color,...
             matchedPoints_frame, matchedPoints_keyframe);
     end
+    %}
     
     % MUST UNCOMMENT
     [~, in_dist, in_orig] = estimateGeometricTransform(...
-        matchedPoints_frame, matchedPoints_keyframe, 'affine');
+        matchedPoints_frame, matchedPoints_keyframe, 'projective');
     %in_dist = matchedPoints_frame;
     %in_orig = matchedPoints_keyframe;
    
+    %{
     if frame_idx == 100
         figure;
-        showMatchedFeatures(freiburg2{frame_idx}.Color,freiburg2{key_idx}.Color...
-            , in_dist, in_orig)
+        showMatchedFeatures(freiburg2{key_idx}.Color, freiburg2{frame_idx}.Color,...
+            in_orig, in_dist)
     end
+    %}
     % Determine the x, y coordinates of all matched points and round
     % to convert to pixel location
     loc_frame = round(in_dist.Location);
