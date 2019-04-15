@@ -13,7 +13,8 @@ global poses;
 
 global window
 max_num_keyframes = 3;
-window.num_keyframes = 0;
+% There will be 2 keyframes before we first increment num_keyframes
+window.num_keyframes = 2;
 % Holds a cell array of frame structs
 window.keyframes = cell(1, max_num_keyframes);
 window.maxFrameIdx = 0;
@@ -138,8 +139,8 @@ for i=1:num_frames
         tform = findInitailTform(ptcloud_frame, ptcloud_keyframe);
         
         % Place transforms from 1-2 and 2-3 in poses
-        poses{counter + 1} = poses{counter} * optimized_tforms{1};
-        poses{counter + 2} = poses{counter + 1} * optimized_tforms{2};
+        poses{counter + 1} = poses{counter} * optimized_tforms{2};
+        poses{counter + 2} = poses{counter} * optimized_tforms{3};
         counter = counter + 1;
         
         window.transform = optimized_tforms;
@@ -149,4 +150,13 @@ for i=1:num_frames
     end
 
 end
+
+% Get trajectory
+est_traj = zeros(window.num_keyframes, 3);
+for j = 1:window.num_keyframes
+    pt = poses{j} * [0; 0; 0; 1];
+    est_traj(j, :) = pt(1:3)';
+end
+    
+disp("DONE")
 % compare poses to GT and plot results
