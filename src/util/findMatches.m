@@ -1,4 +1,5 @@
-function [loc_frame, loc_keyframe] = findMatches(features, points, frame_idx, kframe_idx_in_window)
+function [loc_frame, loc_keyframe, features, points] = findMatches(...
+                features, points, frame_idx, kframe_idx_in_window)
     global window;
     global freiburg2;
     
@@ -22,6 +23,9 @@ function [loc_frame, loc_keyframe] = findMatches(features, points, frame_idx, kf
     matchedPoints_frame = points(index_pair(:, 1));
     matchedPoints_keyframe = keyframe_points(index_pair(:, 2));
     
+    if frame_idx == 90
+        disp("here")
+    end
     % MUST UNCOMMENT
     [~, in_dist, in_orig] = estimateGeometricTransform(...
         matchedPoints_frame, matchedPoints_keyframe, 'projective');

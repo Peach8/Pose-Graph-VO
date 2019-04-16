@@ -39,15 +39,13 @@ function [isKey] = isKeyFrame(frame_idx)
 %     loc_keyframe = round(in_orig.Location);
     
     % Find matches using findMatches function
-    [loc_frame, loc_keyframe] = findMatches(features, points, frame_idx,...
-                                            window.maxFrameIdx);
+    [loc_frame, loc_keyframe, features, points] = findMatches(features,...
+                        points, frame_idx, window.maxFrameIdx);
     % Construct point cloud using location of matched_points
     ptcloud_frame = zeros(size(loc_frame, 1), 3);
     ptcloud_keyframe = zeros(size(loc_keyframe, 1), 3);
     key_idx = window.keyframes{window.maxFrameIdx}.frameIdx;
-    %figure;
-    %imshow(freiburg2{frame_idx}.Color); hold on;
-    %scatter(loc_frame(:, 1), loc_frame(:, 2), 'filled');
+ 
     for i=1:size(loc_frame, 1)
         ptcloud_frame(i, :) = freiburg2{frame_idx}.Location(...
             loc_frame(i, 2), loc_frame(i, 1), :);
@@ -95,7 +93,7 @@ function [isKey] = isKeyFrame(frame_idx)
         
         % Loop through previous keyframes and find any connections
         for kframe=1:(window.maxFrameIdx - 2)
-             loc_frame, loc_keyframe = findMatches(features, points, frame_idx,...
+             [loc_frame, loc_keyframe, ~, ~] = findMatches(features, points, frame_idx,...
                                             kframe);
              % Check if frame share enough points
              if size(loc_frame, 1) >= window.connectionThresh

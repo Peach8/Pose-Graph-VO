@@ -14,10 +14,8 @@ global poses;
 global window
 
 % This will now be a dynamic variable.
-max_num_keyframes = 3;
+max_num_keyframes = 40;
 
-% There will be 2 keyframes before we first increment num_keyframes
-window.num_keyframes = 2;
 % Holds a cell array of frame structs
 window.keyframes = cell(1, max_num_keyframes);
 % Frame indices of all keyframes
@@ -54,14 +52,14 @@ window.minimum = 400;
 global freiburg2;
 freiburg2 = load('freiburg2.mat');
 freiburg2 = freiburg2.freiburg2;
-num_frames = 10;
+num_frames = 300;
 % The poses array will store all camera poses over the trajectory.
 % The first pose will simply be the identity matrix.
 poses = cell(1, num_frames);
 poses{1} = eye(4);
 
 % Counter to place poses in the right index
-counter = 1;
+counter_pose = 1;
 for i=1:num_frames
     i
     %decide if a frame could be a keyframe
@@ -162,18 +160,17 @@ for i=1:num_frames
         end
         
         % Run joint optimization
-        optimized_tforms = joint_optimization(transform,  keys);
-        tform = findInitailTform(ptcloud_frame, ptcloud_keyframe);
+        optimized_tforms = joint_optimization(transform,  keys, max_num_keyframes);
         
         % Place transforms from all keyframes in poses
         for n=2:length(optimized_tforms)
-            poses{counter + n} = poses{counter} * optimized_tforms{n};
+            poses{counter_pose + (n-1)} = poses{counter_pose} * optimized_tforms{n};
         end
-        counter = counter + 1;
+        counter_pose = counter_pose + 1;
         
         % Calculate successive transformations
         window.transform{1,2} = optimized_tforms{1};
-        for n=2:length(optimized_tforms)
+        for n=2:(length(optimized_tforms) - 1)
             window.transform{n,n+1} = optimized_tforms{n} / (optimized_tforms{n-1});
         end
         
@@ -196,9 +193,11 @@ for i=1:num_frames
         for n = 1:length(keys)
             idx1 = keys{n}(1);
             idx2 = keys{n}(2);
-            if (idx1 >= 1 && idx2 >= 1)
-                window.transform{idx1-1, idx2-1} = optimized_tforms{n};
-                window.connections{idx1-1, idx2-1} = 1;
+            if (idx1 > 1 && idx2 > 1)
+                window.transform{idx1-1, idx2-1} = window.transform{idx1, idx2};
+                if (abs((idx1-1) - (idx2-1)) > 1)
+                    window.connections(idx1-1, idx2-1) = 1;
+                end
             end
         end
         
@@ -214,8 +213,8 @@ for i=1:num_frames
 end
 
 % Get trajectory
-est_traj = zeros(window.num_keyframes, 3);
-for j = 1:window.num_keyframes
+est_traj = zeros(length(window.kframe_indices), 3);
+for j = 1:length(window.kframe_indices)
     pt = poses{j} * [0; 0; 0; 1];
     est_traj(j, :) = pt(1:3)';
 end
