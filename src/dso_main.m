@@ -36,6 +36,7 @@ window.connections = zeros(max_num_keyframes, max_num_keyframes);
 window.flowThresh = 0.2;
 % There must be at least 20 non-outlier matches
 % between keyframes
+
 %window.minNumMatches = 120;
 window.minNumMatches = 400;
 window.connectionThresh = 80;
