@@ -1,5 +1,5 @@
 function jointPose = joint_optimization(Z, Keys, N)
-% input: Z is from DVO, twist between key frames
+% input: Z is from DVO, twist between 1-2, 2-3, 1-3
 %        Keys is the factor
 %        N is window size
 % output: twist between connected nodes in a window
@@ -13,7 +13,8 @@ Lz = chol(Sigma, 'lower');
 T_init = cell(N,1);
 T_init{1} = eye(4);
 for i = 2:N
-    T_init{i} = T_init{i-1}*Z{i-1}; 
+    T_init{i} = T_init{i-1}*Z{i-1}; % 2
+    T_init{3} = Z{1}*Z{2}; % 3
 end
 
 % Jacobian matrix

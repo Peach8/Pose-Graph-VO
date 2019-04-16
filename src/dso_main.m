@@ -27,7 +27,7 @@ window.transform = cell(1, max_num_keyframes);
 window.flowThresh = 0.2;
 % There must be at least 20 non-outlier matches
 % between keyframes
-window.minNumMatches = 120;
+window.minNumMatches = 500;
 %window.minNumMatches = 100;
 window.minimum = 400;
 

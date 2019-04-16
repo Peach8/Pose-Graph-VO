@@ -17,7 +17,7 @@ for i = 1:length(freiburg2)-2
     
     % 1-2, 2-3, 1-3
     ptCloud1 = freiburg2{i};
-    ptCloud2 = freiburg2{i+1};
+    ptCloudMove = freiburg2{i+1};
     ptCloud3 = freiburg2{i+2};
     dvo = rgbd_dvo();
     R_init = eye(3);
@@ -40,8 +40,8 @@ for i = 1:length(freiburg2)-2
             fprintf('%f resolution\n',percen)
             % moving - fixed : 1-2
             fixed1 = [];
-            fixed1.ptcloud = removeInvalidPoints(pcdownsample(ptCloud2, 'random', percen));
-            fixed1.image = rgb2gray(ptCloud2.Color);
+            fixed1.ptcloud = removeInvalidPoints(pcdownsample(ptCloudMove, 'random', percen));
+            fixed1.image = rgb2gray(ptCloudMove.Color);
             moving1 = removeInvalidPoints(pcdownsample(ptCloud1, 'random', percen));
             % make rkhs registration object
             dvo = rgbd_dvo();
@@ -61,7 +61,7 @@ for i = 1:length(freiburg2)-2
         fixed2 = [];
         fixed2.ptcloud = removeInvalidPoints(pcdownsample(ptCloud3, 'random', percen));
         fixed2.image = rgb2gray(ptCloud3.Color);
-        moving2 = removeInvalidPoints(pcdownsample(ptCloud2, 'random', percen));
+        moving2 = removeInvalidPoints(pcdownsample(ptCloudMove, 'random', percen));
         % make rkhs registration object
         dvo = rgbd_dvo();
         dvo.set_ptclouds(fixed2, moving2);
@@ -133,123 +133,91 @@ for i = 1:length(freiburg2)-2
     
     toc
     
-    % Visualize the input images.
-    figure(1)
-    subplot(2,2,1)
-    imshow(ptCloud3.Color)
-    title('First input image')
-    drawnow
-
-    subplot(2,2,3)
-    imshow(ptCloud1.Color)
-    title('Second input image')
-    drawnow
-
-    % Visualize the world scene.
-    subplot(2,2,[2,4])
-    pcshow(ptCloudScene, 'VerticalAxis','Y', 'VerticalAxisDir', 'Down')
-    title('Initial world scene')
-    xlabel('X (m)')
-    ylabel('Y (m)')
-    zlabel('Z (m)')
-    drawnow
+%     % Visualize the input images.
+%     figure(1)
+%     subplot(2,2,1)
+%     imshow(ptCloud3.Color)
+%     title('First input image')
+%     drawnow
+% 
+%     subplot(2,2,3)
+%     imshow(ptCloud1.Color)
+%     title('Second input image')
+%     drawnow
+% 
+%     % Visualize the world scene.
+%     subplot(2,2,[2,4])
+%     pcshow(ptCloudScene, 'VerticalAxis','Y', 'VerticalAxisDir', 'Down')
+%     title('Initial world scene')
+%     xlabel('X (m)')
+%     ylabel('Y (m)')
+%     zlabel('Z (m)')
+%     drawnow
     
     
 end
 
 %% trajectory
-temp = 15
+temp = 357;
 X = zeros(temp,1);
 Y = zeros(temp,1);
 Z = zeros(temp,1);
 
 
 for i = 1:temp
-    coor = pose_to_coord(POSEL{i})
-    X(i) = coor(1);
-    Y(i) = coor(2);
-    Z(i) = coor(3);
-%     X(i) = COORD{i}(1);
-%     Y(i) = COORD{i}(2);
-%     Z(i) = COORD{i}(3);
+%     coor = pose_to_coord(POSEL{i})
+%     X(i) = coor(1);
+%     Y(i) = coor(2);
+%     Z(i) = coor(3);
+    X(i) = COORD{i}(1);
+    Y(i) = COORD{i}(2);
+    Z(i) = COORD{i}(3);
 end
-GT = load('GT.mat');
-xyz = GT.xyz;
-xyz = xyz*10;
 
-xyz(:,1) = xyz(:,1) - xyz(1,1);
-xyz(:,2) = xyz(:,2) - xyz(1,2);
-xyz(:,3) = xyz(:,3) - xyz(1,3);
+
+% 
+% A = [X, Y, Z];
+% GT = load('GT.mat');
+% xyz = GT.xyz;
+% xyz = xyz*10;
+% 
+% xyz(:,1) = xyz(:,1) - xyz(1,1);
+% xyz(:,2) = xyz(:,2) - xyz(1,2);
+% xyz(:,3) = xyz(:,3) - xyz(1,3);
 
 
 
 figure(4)
 plot3(X,Y,Z)
 hold on
-plot3(xyz(1:1000,1),xyz(1:1000,2),-xyz(1:1000,3))
+plot3(COORD_2(:,1),COORD_2(:,2),COORD_2(:,3))
 hold off
-legend('estimated','ground truth')
+legend('direct','indirect')
+
+
 
 %% Stitch a Sequence of Point Clouds
-% To compose a larger 3-D scene, repeat the same procedure as above to
-% process a sequence of point clouds. Use the first point cloud to
-% establish the reference coordinate system. Transform each point cloud to
-% the reference coordinate system. This transformation is a multiplication
-% of pairwise transformations.
 
-% Store the transformation object that accumulates the transformation.
-% accumTform = tform; 
-% 
-% figure
-% hAxes = pcshow(ptCloudScene, 'VerticalAxis','Y', 'VerticalAxisDir', 'Down');
-% title('Updated world scene')
-% % Set the axes property for faster rendering
-% hAxes.CameraViewAngleMode = 'auto';
-% hScatter = hAxes.Children;
-% 
-% for i = 3:length(livingRoomData)
-%     ptCloudCurrent = ptcloud_edge_filter(livingRoomData{i});
-%        
-%     % Use previous moving point cloud as reference.
-%     fixed.ptcloud = moving;
-%     % load RGB image
-%     fixed.image = rgb2gray(livingRoomData{i}.Color);
-%     moving = pcdownsample(ptCloudCurrent, 'gridAverage', gridSize);
-%     
-% %     tform = pc_gradient_descent(moving, fixed);
-%     dvo.set_ptclouds(fixed, moving);
-%     dvo.align();
-%     tform = dvo.tform;
-% 
-%     % Transform the current point cloud to the reference coordinate system
-%     % defined by the first point cloud.
-%     accumTform = affine3d(tform.T * accumTform.T);
-%     ptCloudAligned = pctransform(livingRoomData{i}, accumTform);
-%     
-%     % Update the world scene.
-%     ptCloudScene = pcmerge(ptCloudScene, ptCloudAligned, mergeSize);
-% 
-%     % Visualize the world scene.
-%     hScatter.XData = ptCloudScene.Location(:,1);
-%     hScatter.YData = ptCloudScene.Location(:,2);
-%     hScatter.ZData = ptCloudScene.Location(:,3);
-%     hScatter.CData = ptCloudScene.Color;
-%     drawnow('limitrate')
-% end
-% 
-% % During the recording, the Kinect was pointing downward. To visualize the
-% % result more easily, let's transform the data so that the ground plane is
-% % parallel to the X-Z plane.
-% angle = -pi/10;
-% A = [1,0,0,0;...
-%      0, cos(angle), sin(angle), 0; ...
-%      0, -sin(angle), cos(angle), 0; ...
-%      0 0 0 1];
-% ptCloudScene = pctransform(ptCloudScene, affine3d(A));
-% pcshow(ptCloudScene, 'VerticalAxis','Y', 'VerticalAxisDir', 'Down', ...
-%         'Parent', hAxes)
-% title('Updated world scene')
-% xlabel('X (m)')
-% ylabel('Y (m)')
-% zlabel('Z (m)')
-% toc;
+PtCloud1 = freiburg2{1};
+for i = 2:357
+%     ptCloudCurrent = ptcloud_edge_filter(freiburg2{i});
+    ptCloud2 = freiburg2{i};
+    
+    tform21 = affine3d(POSES_2{i}^(-1)'); % direct
+%     tform21 = affine3d(poses{i}^(-1)'); % indirect
+    
+    ptCloudtransformed2 = pctransform(ptCloud2, tform21);
+
+    mergeSize = 0.015;
+    PtCloud1 = pcmerge(PtCloud1, ptCloudtransformed2, mergeSize);
+
+end
+
+% Visualize the world scene.
+figure(5)
+pcshow(PtCloud1, 'VerticalAxis','Y', 'VerticalAxisDir', 'Down')
+title('world scene')
+xlabel('X (m)')
+ylabel('Y (m)')
+zlabel('Z (m)')
+drawnow
