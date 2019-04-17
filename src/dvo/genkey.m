@@ -35,6 +35,6 @@ for i = 1:(length(freiburg3)-2)
     KEYS{i}{1}(2) = i+1;
     KEYS{i}{2}(1) = i+1;
     KEYS{i}{2}(2) = i+2;
-    KEYS{i}{3}(1) = i+1;
-    KEYS{i}{3}(2) = i+3;
+    KEYS{i}{3}(1) = i;
+    KEYS{i}{3}(2) = i+2;
 end

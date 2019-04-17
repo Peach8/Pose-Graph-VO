@@ -1,0 +1,2 @@
+freiburg31 = freiburg3(1:200);
+freiburg32 = freiburg3(201:200);

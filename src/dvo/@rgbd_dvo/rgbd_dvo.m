@@ -99,20 +99,20 @@ classdef rgbd_dvo < handle
                 if any(target.image > 1)
                     target.image = double(target.image) / 255;
                 end
-                % Freiburg 2
-                fx = 520.9;  % focal length x
-                fy = 521.0;  % focal length y
-                cx = 325.1;  % optical center x
-                cy = 249.7;  % optical center y
+%                 % Freiburg 2
+%                 fx = 520.9;  % focal length x
+%                 fy = 521.0;  % focal length y
+%                 cx = 325.1;  % optical center x
+%                 cy = 249.7;  % optical center y
                 obj.fixed_image = target.image;
                 % compute image intensity gradient
                 [obj.imgrad.u, obj.imgrad.v] = imgradientxy(target.image, 'central');
                 obj.moving = source;
                 obj.cloud_x = double(obj.fixed.Location);
-                obj.U_fixed = obj.cloud_x(:,1) * fx ./ (obj.cloud_x(:,3)) + cx;           %% project cloud_y form 3D to 2D
-                obj.V_fixed = obj.cloud_x(:,2) * fy ./ (obj.cloud_x(:,3)) + cy;   
-                obj.U_fixed = round(obj.U_fixed);
-                obj.V_fixed = round(obj.V_fixed);
+%                 obj.U_fixed = obj.cloud_x(:,1) * fx ./ (obj.cloud_x(:,3)) + cx;           %% project cloud_y form 3D to 2D
+%                 obj.V_fixed = obj.cloud_x(:,2) * fy ./ (obj.cloud_x(:,3)) + cy;   
+%                 obj.U_fixed = round(obj.U_fixed);
+%                 obj.V_fixed = round(obj.V_fixed);
                 obj.u_max = size(target.image,2);
                 obj.v_max = size(target.image,1);
                 obj.intensity_y = obj.rgb2intensity(source.Color);
@@ -228,9 +228,9 @@ classdef rgbd_dvo < handle
 %                     obj.fixed_image2(obj.V_fixed(i),obj.U_fixed(i))= obj.fixed_image(obj.V_fixed(i), obj.U_fixed(i));
             end
 % 
-%             figure(1);
-%             imshow(obj.fixed_image2);
-%             title('Fixed Image'); 
+            figure(1);
+            imshow(obj.fixed_image2);
+            title('Fixed Image'); 
             
             
             if isempty(obj.Kf)
@@ -287,10 +287,10 @@ classdef rgbd_dvo < handle
                 obj.v = obj.twist(1:3);
                 obj.omega = obj.twist(4:6);
                 
-%                 figure(2)
-%                 hold on;
-%                 scatter(k,norm(obj.residual),'r*');
-%                 title('Residual Minimization');
+                figure(2)
+                scatter(k,norm(obj.residual),'r*');
+                hold on;
+                title('Residual Minimization');
 
                 if max(norm(obj.omega),norm(obj.v)) < obj.eps
                     break;
@@ -312,10 +312,12 @@ classdef rgbd_dvo < handle
                 obj.T = T_new;
                 % Our other break
 %                 disp(obj.dist_se3(dR,dT))
-                if obj.dist_se3(dR,dT) < obj.eps_2
+                if obj.dist_se3(dR,dT) < obj.eps_2 || norm(obj.residual) < 3
                     break;
                 end               
             end
+            figure(2)
+            hold off;
             
             obj.tform = affine3d([obj.R, obj.T; 0, 0, 0, 1]');
             obj.iterations = k;
