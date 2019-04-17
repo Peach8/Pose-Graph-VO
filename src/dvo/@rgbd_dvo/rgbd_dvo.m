@@ -186,16 +186,16 @@ classdef rgbd_dvo < handle
 %             cy = 255.3;  % optical center y
             
             % Freiburg 2
-            fx = 520.9;  % focal length x
-            fy = 521.0;  % focal length y
-            cx = 325.1;  % optical center x
-            cy = 249.7;  % optical center y
+%             fx = 520.9;  % focal length x
+%             fy = 521.0;  % focal length y
+%             cx = 325.1;  % optical center x
+%             cy = 249.7;  % optical center y
             
             % Freiburg 3
-%             fx = 535.4;  % focal length x
-%             fy = 539.2;  % focal length y
-%             cx = 320.1;  % optical center x
-%             cy = 247.6;  % optical center y
+            fx = 535.4;  % focal length x
+            fy = 539.2;  % focal length y
+            cx = 320.1;  % optical center x
+            cy = 247.6;  % optical center y
             
             obj.U = (obj.cloud_y(:,1) * fx ./ obj.cloud_y(:,3)) + cx;
             obj.V = (obj.cloud_y(:,2) * fy ./ obj.cloud_y(:,3)) + cy;
@@ -227,11 +227,11 @@ classdef rgbd_dvo < handle
             for i = 1:size(obj.U_fixed,1)
 %                     obj.fixed_image2(obj.V_fixed(i),obj.U_fixed(i))= obj.fixed_image(obj.V_fixed(i), obj.U_fixed(i));
             end
-
+% 
 %             figure(1);
 %             imshow(obj.fixed_image2);
 %             title('Fixed Image'); 
-%             
+            
             
             if isempty(obj.Kf)
                 obj.Kf = @(x) [fx/x(3), 0    , -(fx*x(1))/x(3)^2;

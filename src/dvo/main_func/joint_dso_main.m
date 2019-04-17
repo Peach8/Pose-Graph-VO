@@ -1,47 +1,24 @@
 %% load point cloud
-
 clear; close all
 
-freiburg2 = load('freiburg2.mat');
-freiburg2 = freiburg2.freiburg2(1:50);
-
-KEYS = load('testkeys.mat');
-KEYS = KEYS.KEYS(1:46);
-
-
-
 % load key information
-% %%%%% to do: KEYS
-% KEYS = cell(2,1);
-% KEYS{1} = cell(6,1);
-% KEYS{1}{1}(1) = 1;
-% KEYS{1}{1}(2) = 2;
-% KEYS{1}{2}(1) = 2;
-% KEYS{1}{2}(2) = 3;
-% KEYS{1}{3}(1) = 3;
-% KEYS{1}{3}(2) = 4;
-% KEYS{1}{4}(1) = 1;
-% KEYS{1}{4}(2) = 3;
-% KEYS{1}{5}(1) = 2;
-% KEYS{1}{5}(2) = 4;
-% KEYS{1}{6}(1) = 1;
-% KEYS{1}{6}(2) = 4;
-% 
-% 
-% KEYS{2} = cell(4,1);
-% KEYS{2}{1}(1) = 2;
-% KEYS{2}{1}(2) = 3;
-% KEYS{2}{2}(1) = 3;
-% KEYS{2}{2}(2) = 4;
-% KEYS{2}{3}(1) = 4;
-% KEYS{2}{3}(2) = 5;
-% KEYS{2}{4}(1) = 2;
-% KEYS{2}{4}(2) = 5;
+kframe_idx = load('window_40_kframe_indices.mat');
+kframe_idx = kframe_idx.kframe_indices;
+KEY = load('window_40_keys.mat');
+KEY = KEY.keys;
+
+KEYS = cell(1,1);
+KEYS{1} = KEY;
+
+% load and process data
+freiburg2 = load('freiburg2.mat');
+freiburg2 = freiburg2.freiburg2(kframe_idx);
+
+% N = window size
+N = 40;
 
 
-%%%%% to do: N = window size
-N = 5;
-
+%%
 % init 
 POSE = cell(length(freiburg2),1);
 POSE{1} = eye(4);
@@ -152,68 +129,60 @@ for i = 1:length(KEYS)
 end
 
 %% trajectory
-% temp = 50;
-% X = zeros(temp,1);
-% Y = zeros(temp,1);
-% Z = zeros(temp,1);
-% 
-% % estimated
-% for i = 1:temp
-% %     coor = pose_to_coord(POSEL{i})
-% %     X(i) = coor(1);
-% %     Y(i) = coor(2);
-% %     Z(i) = coor(3);
-%     X(i) = COORD{i}(1);
-%     Y(i) = COORD{i}(2);
-%     Z(i) = COORD{i}(3);
-% end
-% 
-% % ground truth
-% GT = load('GT.mat');
-% xyz = GT.xyz;
-% 
-% xyz(:,1) = xyz(:,1) - xyz(1,1);
-% xyz(:,2) = xyz(:,2) - xyz(1,2);
-% xyz(:,3) = xyz(:,3) - xyz(1,3);
-% 
-% 
-% figure(4)
-% c = linspace(1,10,length(X));
-% scatter3(X,Y,Z,10,c,'d')
-% hold on
-% % c = linspace(1,10,length(COORD2(:,1)));
-% % scatter3(COORD2(:,1),COORD2(:,2),COORD2(:,3),10,c,'*')
-% c = linspace(1,10,length(xyz(:,1)));
-% scatter3(xyz(:,2),xyz(:,3),-xyz(:,1),10,c,'filled')
-% hold off
-% legend('direct','indirect','gt')
-% xlabel('x')
-% ylabel('y')
-% zlabel('z')
+temp = 40;
+Xc = zeros(temp,1);
+Yc = zeros(temp,1);
+Zc = zeros(temp,1);
+
+% estimated
+for i = 1:temp
+    Xc(i) = COORD{i}(1);
+    Yc(i) = COORD{i}(2);
+    Zc(i) = COORD{i}(3);
+end
+
+% ground truth
+gtcoord_xyz = load('gtcoord_xyz.mat');
+xyz = gtcoord_xyz.xyz;
+
+
+figure(4)
+c = linspace(1,10,length(X));
+scatter3(Xc,Yc,Zc,10,c,'d')
+hold on
+% c = linspace(1,10,length(COORD2(:,1)));
+% scatter3(COORD2(:,1),COORD2(:,2),COORD2(:,3),10,c,'*')
+c = linspace(1,10,length(xyz(:,1)));
+scatter3(-xyz(:,1),xyz(:,2),-xyz(:,3),10,c,'filled')
+hold off
+legend('direct','gt')
+xlabel('x')
+ylabel('y')
+zlabel('z')
 
 
  %% Stitch a Sequence of Point Clouds
-% 
-% PtCloud1 = freiburg2{1};
-% for i = 2:100
-% %     ptCloudCurrent = ptcloud_edge_filter(freiburg2{i});
-%     ptCloud2 = freiburg2{i};
-%     
-%     tform21 = affine3d(POSE{i}^(-1)'); % direct
-% %     tform21 = affine3d(poses{i}^(-1)'); % indirect
-%     
-%     ptCloudtransformed2 = pctransform(ptCloud2, tform21);
-% 
-%     mergeSize = 0.015;
-%     PtCloud1 = pcmerge(PtCloud1, ptCloudtransformed2, mergeSize);
-% 
-% end
-% 
-% % Visualize the world scene.
-% figure(5)
-% pcshow(PtCloud1, 'VerticalAxis','Y', 'VerticalAxisDir', 'Down')
-% title('world scene')
-% xlabel('X (m)')
-% ylabel('Y (m)')
-% zlabel('Z (m)')
-% drawnow
+
+PtCloud1 = freiburg2{1};
+for i = 2:40
+%     ptCloudCurrent = ptcloud_edge_filter(freiburg2{i});
+    ptCloud2 = freiburg2{i};
+    
+    tform21 = affine3d(poses2{i}^(-1)'); % direct
+%     tform21 = affine3d(poses{i}^(-1)'); % indirect
+    
+    ptCloudtransformed2 = pctransform(ptCloud2, tform21);
+
+    mergeSize = 0.015;
+    PtCloud1 = pcmerge(PtCloud1, ptCloudtransformed2, mergeSize);
+
+end
+
+% Visualize the world scene.
+figure(5)
+pcshow(PtCloud1, 'VerticalAxis','Y', 'VerticalAxisDir', 'Down')
+title('world scene')
+xlabel('X (m)')
+ylabel('Y (m)')
+zlabel('Z (m)')
+drawnow
