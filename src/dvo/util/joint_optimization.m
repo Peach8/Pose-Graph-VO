@@ -2,7 +2,7 @@ function jointPose = joint_optimization(Z, Keys, N)
 % input: Z is from DVO, twist between key frames
 %        Keys is the factor
 %        N is window size
-% output: twist between connected nodes in a window
+% output: poses of the other nodes w.r.t the first node in the window
 
 idx_off = Keys{1}(1)-1;
 

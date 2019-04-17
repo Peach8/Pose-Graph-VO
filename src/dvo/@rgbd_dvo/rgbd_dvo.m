@@ -11,11 +11,11 @@ classdef rgbd_dvo < handle
         gradI;                  % intensity gradient
         MAX_ITER = 100;        % maximum number of iteration
         % The program stops if norm(omega)+norm(v) < eps
-        eps = 1.2e-4;
+        eps = 1e-4;
         eps_2 = 6e-4;
         R = eye(3);             % initial orientation 
-%         T = zeros(3,1);         % initial translation
-        T = [0.05;0;0];         % initial translation
+        T = zeros(3,1);         % initial translation
+%         T = [0.05;0;0];         % initial translation
         omega;                  % so(3) part of twist
         v;                      % R^3 part of twist
         tform;                  % SE(3) tf
@@ -231,7 +231,7 @@ classdef rgbd_dvo < handle
 %             figure(1);
 %             imshow(obj.fixed_image2);
 %             title('Fixed Image'); 
-            
+%             
             
             if isempty(obj.Kf)
                 obj.Kf = @(x) [fx/x(3), 0    , -(fx*x(1))/x(3)^2;
