@@ -31,7 +31,6 @@ function [loc_frame, loc_keyframe, features, points] = findMatches(...
     if status == 0 % no error
         % check for warning
         if strcmp(msgid, 'vision:ransac:maxTrialsReached')
-            disp('WARNING DETECTED')
             loc_frame = [];
             loc_keyframe = []; 
         else % if no error or warning

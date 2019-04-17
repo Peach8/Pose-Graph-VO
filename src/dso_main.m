@@ -14,7 +14,7 @@ global poses;
 global window
 
 % This will now be a dynamic variable.
-max_num_keyframes = 40;
+max_num_keyframes = 30;
 
 % Holds a cell array of frame structs
 window.keyframes = cell(1, max_num_keyframes);
@@ -36,7 +36,7 @@ window.flowThresh = 0.2;
 % between keyframes
 
 %window.minNumMatches = 120;
-window.minNumMatches = 400;
+window.minNumMatches = 120;
 window.connectionThresh = 80;
 
 window.minimum = 400;
@@ -52,7 +52,7 @@ window.minimum = 400;
 global freiburg2;
 freiburg2 = load('freiburg2.mat');
 freiburg2 = freiburg2.freiburg2;
-num_frames = 300;
+num_frames = size(freiburg2, 2);
 % The poses array will store all camera poses over the trajectory.
 % The first pose will simply be the identity matrix.
 poses = cell(1, num_frames);
@@ -132,7 +132,7 @@ for i=1:num_frames
         %}
         % Compute initial transformation matrix between point clouds
         % from keyframe to frame
-%         tform = findInitailTform(ptcloud_frame, ptcloud_keyframe);
+%         tform = findInitialTform(ptcloud_frame, ptcloud_keyframe);
 %         window.transform{3} = tform;
 %         
 %         det(window.transform{1})

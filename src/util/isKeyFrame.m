@@ -59,7 +59,7 @@ function [isKey] = isKeyFrame(frame_idx)
 %     ptkey = ptcloud_keyframe(~rows_remove, :);
     % Compute initial transformation matrix between point clouds
     % from keyframe to frame
-    tform = findInitailTform(ptcloud_frame, ptcloud_keyframe);
+    tform = findInitialTform(ptcloud_frame, ptcloud_keyframe);
     
     %a = tform * [ptframe'; ones(1, size(ptframe, 1))];
     %b = [ptkey'; ones(1, size(ptframe, 1))];
@@ -115,7 +115,7 @@ function [isKey] = isKeyFrame(frame_idx)
 
                 % Compute initial transformation matrix between point clouds
                 % from keyframe to frame
-                tform = findInitailTform(ptcloud_frame, ptcloud_keyframe);
+                tform = findInitialTform(ptcloud_frame, ptcloud_keyframe);
                 % ======
                 % Store transformation matrix
                 window.transform{kframe, window.maxFrameIdx} = tform;
