@@ -23,14 +23,24 @@ function [loc_frame, loc_keyframe, features, points] = findMatches(...
     matchedPoints_frame = points(index_pair(:, 1));
     matchedPoints_keyframe = keyframe_points(index_pair(:, 2));
     
+    lastwarn(''); % clear last warning
     [~, in_dist, in_orig, status] = estimateGeometricTransform(...
             matchedPoints_frame, matchedPoints_keyframe, 'projective');
+    [~, msgid] = lastwarn;
+    
     if status == 0 % no error
-        % Determine the x, y coordinates of all matched points and round
-        % to convert to pixel location
-        loc_frame = round(in_dist.Location);
-        loc_keyframe = round(in_orig.Location);        
-    else % either notEnoughMatchedPts or notEnoughInlierMatches
+        % check for warning
+        if strcmp(msgid, 'vision:ransac:maxTrialsReached')
+            disp('WARNING DETECTED')
+            loc_frame = [];
+            loc_keyframe = []; 
+        else % if no error or warning
+            % Determine the x, y coordinates of all matched points and round
+            % to convert to pixel location
+            loc_frame = round(in_dist.Location);
+            loc_keyframe = round(in_orig.Location);
+        end
+    else % error: notEnoughMatchedPts or notEnoughInlierMatches
         loc_frame = [];
         loc_keyframe = [];        
     end
