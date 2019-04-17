@@ -167,10 +167,12 @@ figure(4)
 c = linspace(1,10,length(X));
 scatter3(X,Y,Z,10,c,'d')
 hold on
+c = linspace(1,10,length(COORD2(:,1)));
+scatter3(COORD2(:,1),COORD2(:,2),COORD2(:,3),10,c,'*')
 c = linspace(1,10,length(xyz(:,1)));
 scatter3(xyz(:,2),xyz(:,3),-xyz(:,1),10,c,'filled')
 hold off
-legend('direct','gt')
+legend('direct','indirect','gt')
 xlabel('x')
 ylabel('y')
 zlabel('z')
