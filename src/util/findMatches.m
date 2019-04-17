@@ -23,15 +23,18 @@ function [loc_frame, loc_keyframe, features, points] = findMatches(...
     matchedPoints_frame = points(index_pair(:, 1));
     matchedPoints_keyframe = keyframe_points(index_pair(:, 2));
     
-    if frame_idx == 90
-        disp("here")
+    try
+        [~, in_dist, in_orig] = estimateGeometricTransform(...
+            matchedPoints_frame, matchedPoints_keyframe, 'projective');
+        % Determine the x, y coordinates of all matched points and round
+        % to convert to pixel location
+        loc_frame = round(in_dist.Location);
+        loc_keyframe = round(in_orig.Location);
+    catch err
+        if strcmp(err.identifier, 'vision:points:notEnoughInlierMatches') || strcmp(err.identifier, 'vision:points:notEnoughMatchedPts')
+            loc_frame = [];
+            loc_keyframe = [];
+        end
     end
-    % MUST UNCOMMENT
-    [~, in_dist, in_orig] = estimateGeometricTransform(...
-        matchedPoints_frame, matchedPoints_keyframe, 'projective');
-    
-    % Determine the x, y coordinates of all matched points and round
-    % to convert to pixel location
-    loc_frame = round(in_dist.Location);
-    loc_keyframe = round(in_orig.Location);
+
 end
