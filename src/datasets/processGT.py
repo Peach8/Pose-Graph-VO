@@ -20,4 +20,4 @@ while cnt < 32992:
 
 xyz = np.array(xyz)
 
-sio.savemat('gt.mat', mdict={'xyz': xyz})
+sio.savemat('11.mat', mdict={'xyz': xyz})

@@ -137,46 +137,46 @@ for i = 1:length(KEYS)
     drawnow
 end
 
-% %% trajectory
-% temp = 357;
-% X = zeros(temp,1);
-% Y = zeros(temp,1);
-% Z = zeros(temp,1);
-% 
-% 
-% for i = 1:temp
-% %     coor = pose_to_coord(POSEL{i})
-% %     X(i) = coor(1);
-% %     Y(i) = coor(2);
-% %     Z(i) = coor(3);
-%     X(i) = COORD{i}(1);
-%     Y(i) = COORD{i}(2);
-%     Z(i) = COORD{i}(3);
-% end
-% 
-% 
-% 
-% A = [X, Y, Z];
-% GT = load('GT.mat');
-% xyz = GT.xyz;
-% xyz = xyz*10;
-% 
-% % xyz(:,1) = xyz(:,1) - xyz(1,1);
-% % xyz(:,2) = xyz(:,2) - xyz(1,2);
-% % xyz(:,3) = xyz(:,3) - xyz(1,3);
-% 
-% 
-% 
-% figure(4)
-% % plot3(X,Y,Z)
-% % hold on
-% plot3(xyz(:,1),xyz(:,2),xyz(:,3))
-% % hold off
-% legend('direct','gt')
-% 
-% 
-% 
-% %% Stitch a Sequence of Point Clouds
+%% trajectory
+temp = 357;
+X = zeros(temp,1);
+Y = zeros(temp,1);
+Z = zeros(temp,1);
+
+% estimated
+for i = 1:temp
+%     coor = pose_to_coord(POSEL{i})
+%     X(i) = coor(1);
+%     Y(i) = coor(2);
+%     Z(i) = coor(3);
+    X(i) = COORD{i}(1);
+    Y(i) = COORD{i}(2);
+    Z(i) = COORD{i}(3);
+end
+
+% ground truth
+GT = load('GT.mat');
+xyz = GT.xyz;
+
+xyz(:,1) = xyz(:,1) - xyz(1,1);
+xyz(:,2) = xyz(:,2) - xyz(1,2);
+xyz(:,3) = xyz(:,3) - xyz(1,3);
+
+
+figure(4)
+c = linspace(1,10,length(X));
+scatter3(X,Y,Z,10,c,'d')
+hold on
+c = linspace(1,10,length(xyz(:,1)));
+scatter3(xyz(:,2),xyz(:,3),-xyz(:,1),10,c,'filled')
+hold off
+legend('direct','gt')
+xlabel('x')
+ylabel('y')
+zlabel('z')
+
+
+ %% Stitch a Sequence of Point Clouds
 % 
 % PtCloud1 = freiburg2{1};
 % for i = 2:100
