@@ -9,9 +9,10 @@ import scipy.io as sio
 
 data = []
 xyz = []
-GT_file = open('freiburg2_groundtruth_md.txt','r')
+GT_file = open('freiburg3_groundtruth_md.txt','r')
+#line = GT_file.readlines()
 cnt = 0
-while cnt < 32992:
+while cnt < 8710:
    line = GT_file.readline()
    [time, tx, ty, tz, qx, qy, qz, qw] = line.split(' ')
    data.append([float(time), float(tx), float(ty), float(tz), float(qx),float(qy),float(qz),float(qw)])
@@ -20,4 +21,4 @@ while cnt < 32992:
 
 data = np.array(data)
 
-sio.savemat('gtcoord.mat', mdict={'gtcoord': data})
+sio.savemat('freiburg3_gtcoord.mat', mdict={'freiburg3_gtcoord': data})

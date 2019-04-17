@@ -166,12 +166,14 @@ zlabel('z')
 
  %% Stitch a Sequence of Point Clouds
 
-PtCloud1 = freiburg31{1};
-for i = 2:100
+load('indirect_initial_guess_60.mat')
+ %%
+PtCloud1 = freiburg2{1};
+for i = 2:59
 %     ptCloudCurrent = ptcloud_edge_filter(freiburg2{i});
-    ptCloud2 = freiburg31{i};
+    ptCloud2 = freiburg2{i};
     
-    tform21 = affine3d(POSE{i}^(-1)'); % direct
+    tform21 = affine3d(poses{i}^(-1)'); % direct
     
     ptCloudtransformed2 = pctransform(ptCloud2, tform21);
 

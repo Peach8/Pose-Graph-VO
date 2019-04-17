@@ -112,7 +112,6 @@ for i = 1:length(KEYS)
     % Visualize the input images.
     figure(3)
     subplot(2,2,1)
-   
     imshow(ptCloudend.Color)
     title('First input image')
     drawnow
@@ -167,6 +166,8 @@ zlabel('z')
 
  %% Stitch a Sequence of Point Clouds
 
+load('indirect_initial_guess_60.mat')
+ 
 PtCloud1 = freiburg31{1};
 for i = 2:100
 %     ptCloudCurrent = ptcloud_edge_filter(freiburg2{i});
