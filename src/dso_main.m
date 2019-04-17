@@ -14,7 +14,7 @@ global poses;
 global window
 
 % This will now be a dynamic variable.
-max_num_keyframes = 30;
+max_num_keyframes = 20;
 
 % Holds a cell array of frame structs
 window.keyframes = cell(1, max_num_keyframes);
@@ -168,10 +168,10 @@ for i=1:num_frames
         end
         counter_pose = counter_pose + 1;
         
-        % Calculate successive transformations
-        window.transform{1,2} = optimized_tforms{1};
+        % Calculate successive transformationsm
+        window.transform{1,2} = optimized_tforms{2};
         for n=2:(length(optimized_tforms) - 1)
-            window.transform{n,n+1} = optimized_tforms{n} / (optimized_tforms{n-1});
+            window.transform{n,n+1} = optimized_tforms{n} \ (optimized_tforms{n+1});
         end
         
         % Recompute the initial guesses for any connected nodes
@@ -181,8 +181,10 @@ for i=1:num_frames
             window.transform{idx1, idx2} = window.transform{idx1, idx1 + 1};
             l=idx1 + 1;
             while(l < idx2)
-                window.transform{idx1, idx2} = window.transform{l, l+1} * ...
-                                                window.transform{idx1, idx2};
+               % window.transform{idx1, idx2} = window.transform{l, l+1} * ...
+                %                                window.transform{idx1, idx2};
+                window.transform{idx1, idx2} = window.transform{idx1, idx2} * ...
+                                                window.transform{l, l+1};                            
                 l = l + 1;
             end
         end
@@ -195,6 +197,7 @@ for i=1:num_frames
             idx2 = keys{n}(2);
             if (idx1 > 1 && idx2 > 1)
                 window.transform{idx1-1, idx2-1} = window.transform{idx1, idx2};
+                window.transform{idx1,idx2}=[];
                 if (abs((idx1-1) - (idx2-1)) > 1)
                     window.connections(idx1-1, idx2-1) = 1;
                 end
