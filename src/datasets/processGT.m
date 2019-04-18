@@ -1,6 +1,6 @@
 % processGT
-gtcoord = load('gtcoord.mat');
-gtcoord = gtcoord.gtcoord;
+gtcoord = load('freiburg2_gt_filtered.mat');
+gtcoord = gtcoord.freiburg2_gt_filtered;
 gtpose = cell(length(gtcoord),1);
 for i = 1:length(gtcoord)
     gtpose{i} = coord_to_pose(gtcoord(i,:));
@@ -12,10 +12,10 @@ t = off(1:3,4);
 
 offset = [R^(-1), -R^(-1)*t;
           zeros(1,3), 1];
-xyz = zeros(length(gtpose),3);
+gtcoord_xyz = zeros(length(gtpose),3);
 
 for i = 1:length(gtpose)
     gtpose{i} = offset*gtpose{i};
-    xyz(i,:) = gtpose{i}(1:3,4)';
+    gtcoord_xyz(i,:) = gtpose{i}(1:3,4)';
 end
 

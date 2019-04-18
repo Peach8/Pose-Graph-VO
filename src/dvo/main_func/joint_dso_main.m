@@ -1,19 +1,19 @@
 %% load point cloud
-clear; close all
+% clear; close all
 
-% % load key information
-% kframe_idx = load('window_40_kframe_indices.mat');
-% kframe_idx = kframe_idx.kframe_indices;
-% KEY = load('window_40_keys.mat');
-% KEY = KEY.keys;
-% 
-% KEYS = cell(1,1);
-% KEYS{1} = KEY;
-% 
-% % load and process data
-% freiburg2 = load('freiburg2.mat');
-% freiburg2 = freiburg2.freiburg2(kframe_idx);
-% 
+% load key information
+kframe_idx = load('window_40_kframe_indices.mat');
+kframe_idx = kframe_idx.kframe_indices;
+KEY = load('window_40_keys.mat');
+KEY = KEY.keys;
+
+KEYS = cell(1,1);
+KEYS{1} = KEY;
+
+% load and process data
+freiburg2 = load('freiburg2.mat');
+freiburg2 = freiburg2.freiburg2(kframe_idx);
+
 
 
 
@@ -21,11 +21,11 @@ clear; close all
 % init 
 
 % N = window size
-N = 3;
+N = 40;
 
-POSE = cell(length(freiburg31),1);
+POSE = cell(length(freiburg2),1);
 POSE{1} = eye(4);
-COORD = cell(length(freiburg31),1);
+COORD = cell(length(freiburg2),1);
 COORD{1} = pose_to_coord(POSE{1});
 
 for i = 1:length(KEYS)
@@ -37,8 +37,8 @@ for i = 1:length(KEYS)
     beg_idx = KEYS{i}{1}(1);
     end_idx = beg_idx + N - 1;
     
-    ptCloudbeg = freiburg31{beg_idx};
-    ptCloudend = freiburg31{end_idx};
+    ptCloudbeg = freiburg2{beg_idx};
+    ptCloudend = freiburg2{end_idx};
     
     for j = 1:length(KEYS{i})
 
@@ -49,11 +49,11 @@ for i = 1:length(KEYS)
         T_init = zeros(3,1);
         tform12 = affine3d([R_init, T_init; 0, 0, 0, 1]');
 
-        ptCloud1 = freiburg31{fidx1};
-        ptCloud2 = freiburg31{fidx2};
+        ptCloud1 = freiburg2{fidx1};
+        ptCloud2 = freiburg2{fidx2};
         
         % downsample point clouds
-        percen_range = 0.01:0.02:0.03;
+        percen_range = 0.04:0.02:0.08;
         if ~isempty(POSE{fidx2})
             fprintf('%d-%d Already calculated\n',fidx1,fidx2)
             tform12.T = (POSE{fidx1}\POSE{fidx2})';
@@ -109,26 +109,26 @@ for i = 1:length(KEYS)
     
     
     
-    % Visualize the input images.
-    figure(3)
-    subplot(2,2,1)
-    imshow(ptCloudend.Color)
-    title('First input image')
-    drawnow
-
-    subplot(2,2,3)
-    imshow(ptCloudbeg.Color)
-    title('Second input image')
-    drawnow
-
-    % Visualize the world scene.
-    subplot(2,2,[2,4])
-    pcshow(ptCloudScene, 'VerticalAxis','Y', 'VerticalAxisDir', 'Down')
-    title('Initial world scene')
-    xlabel('X (m)')
-    ylabel('Y (m)')
-    zlabel('Z (m)')
-    drawnow
+%     % Visualize the input images.
+%     figure(3)
+%     subplot(2,2,1)
+%     imshow(ptCloudend.Color)
+%     title('First input image')
+%     drawnow
+% 
+%     subplot(2,2,3)
+%     imshow(ptCloudbeg.Color)
+%     title('Second input image')
+%     drawnow
+% 
+%     % Visualize the world scene.
+%     subplot(2,2,[2,4])
+%     pcshow(ptCloudScene, 'VerticalAxis','Y', 'VerticalAxisDir', 'Down')
+%     title('Initial world scene')
+%     xlabel('X (m)')
+%     ylabel('Y (m)')
+%     zlabel('Z (m)')
+%     drawnow
 end
 
 %% trajectory
@@ -166,14 +166,24 @@ zlabel('z')
 
  %% Stitch a Sequence of Point Clouds
 
-load('indirect_initial_guess_60.mat')
- %%
+
+POSE{1} = POSE1{1};
+POSE{2} = POSE1{2};
+off = POSE1{3};
+for n = 1:length(POSE2)
+    POSE{n+2} = off*POSE2{n};
+end
+
+%%
+
+
+
 PtCloud1 = freiburg2{1};
-for i = 2:59
+for i = 2:40
 %     ptCloudCurrent = ptcloud_edge_filter(freiburg2{i});
     ptCloud2 = freiburg2{i};
     
-    tform21 = affine3d(poses{i}^(-1)'); % direct
+    tform21 = affine3d(POSE1{i}^(-1)'); % direct
     
     ptCloudtransformed2 = pctransform(ptCloud2, tform21);
 

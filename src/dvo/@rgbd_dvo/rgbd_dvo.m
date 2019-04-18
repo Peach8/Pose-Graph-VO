@@ -186,16 +186,16 @@ classdef rgbd_dvo < handle
 %             cy = 255.3;  % optical center y
             
             % Freiburg 2
-%             fx = 520.9;  % focal length x
-%             fy = 521.0;  % focal length y
-%             cx = 325.1;  % optical center x
-%             cy = 249.7;  % optical center y
+            fx = 520.9;  % focal length x
+            fy = 521.0;  % focal length y
+            cx = 325.1;  % optical center x
+            cy = 249.7;  % optical center y
             
             % Freiburg 3
-            fx = 535.4;  % focal length x
-            fy = 539.2;  % focal length y
-            cx = 320.1;  % optical center x
-            cy = 247.6;  % optical center y
+%             fx = 535.4;  % focal length x
+%             fy = 539.2;  % focal length y
+%             cx = 320.1;  % optical center x
+%             cy = 247.6;  % optical center y
             
             obj.U = (obj.cloud_y(:,1) * fx ./ obj.cloud_y(:,3)) + cx;
             obj.V = (obj.cloud_y(:,2) * fy ./ obj.cloud_y(:,3)) + cy;
@@ -228,10 +228,10 @@ classdef rgbd_dvo < handle
 %                     obj.fixed_image2(obj.V_fixed(i),obj.U_fixed(i))= obj.fixed_image(obj.V_fixed(i), obj.U_fixed(i));
             end
 % 
-            figure(1);
-            imshow(obj.fixed_image2);
-            title('Fixed Image'); 
-            
+%             figure(1);
+%             imshow(obj.fixed_image2);
+%             title('Fixed Image'); 
+%             
             
             if isempty(obj.Kf)
                 obj.Kf = @(x) [fx/x(3), 0    , -(fx*x(1))/x(3)^2;
@@ -287,10 +287,10 @@ classdef rgbd_dvo < handle
                 obj.v = obj.twist(1:3);
                 obj.omega = obj.twist(4:6);
                 
-                figure(2)
-                scatter(k,norm(obj.residual),'r*');
-                hold on;
-                title('Residual Minimization');
+%                 figure(2)
+%                 scatter(k,norm(obj.residual),'r*');
+%                 hold on;
+%                 title('Residual Minimization');
 
                 if max(norm(obj.omega),norm(obj.v)) < obj.eps
                     break;
@@ -312,12 +312,12 @@ classdef rgbd_dvo < handle
                 obj.T = T_new;
                 % Our other break
 %                 disp(obj.dist_se3(dR,dT))
-                if obj.dist_se3(dR,dT) < obj.eps_2 || norm(obj.residual) < 3
+                if obj.dist_se3(dR,dT) < obj.eps_2
                     break;
                 end               
             end
-            figure(2)
-            hold off;
+%             figure(2)
+%             hold off;
             
             obj.tform = affine3d([obj.R, obj.T; 0, 0, 0, 1]');
             obj.iterations = k;
