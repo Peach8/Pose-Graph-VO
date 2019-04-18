@@ -1,4 +1,4 @@
-function tform=findInitailTform(pc1, pc2)
+function tform=findInitialTform(pc1, pc2)
 
 [~, ~, transform] = procrustes(pc1, pc2, 'scaling', false, 'reflection', false);
 trans = mean(transform.c, 1);
