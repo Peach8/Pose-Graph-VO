@@ -228,9 +228,15 @@ classdef rgbd_dvo < handle
 %                     obj.fixed_image2(obj.V_fixed(i),obj.U_fixed(i))= obj.fixed_image(obj.V_fixed(i), obj.U_fixed(i));
             end
 % 
-%             figure(1);
-%             imshow(obj.fixed_image2);
-%             title('Fixed Image'); 
+            figure(1);
+            imshow(obj.fixed_image2);
+            title('Fixed Image'); 
+            
+            outfile='dvo.gif';
+            frame = getframe(gcf);
+            im = frame2im(frame);
+            [imind,cm] = rgb2ind(im,256);
+            imwrite(imind,cm,outfile,'gif','DelayTime',0,'writemode','append');
 %             
             
             if isempty(obj.Kf)
