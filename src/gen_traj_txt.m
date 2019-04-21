@@ -1,7 +1,5 @@
 clc; clear; close all
 
-format long
-
 COORD = load('direct_coord_win3_stepall.mat');
 COORD = COORD.COORD;
 timestamp = cell(length(COORD),1);
@@ -9,7 +7,7 @@ timestamp = cell(length(COORD),1);
 rgbFiles = dir('C:/Personal Files/Research/dataset/rgbd_dataset_freiburg2_xyz/rgb/*.png');
 
 for i = 1:length(timestamp)
-    name = rgbFiles(10*(i-1)+1).name;
+    name = rgbFiles(i*10).name;
     timestamp{i} = str2num(name(1:end-6));
 end
 

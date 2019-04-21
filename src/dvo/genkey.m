@@ -28,9 +28,9 @@ end
 %% 
 % gen test key for win 3
 % 1-2, 2-3, 1-3
-KEYS = cell(length(freiburg3)-2,1);
+KEYS = cell(length(freiburg2)-1,1);
 
-for i = 1:(length(freiburg3)-2)
+for i = 1:(length(freiburg2)-1)
     KEYS{i}{1}(1) = i;
     KEYS{i}{1}(2) = i+1;
     KEYS{i}{2}(1) = i+1;
