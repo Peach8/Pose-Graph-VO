@@ -6,3 +6,5 @@ How to run a simple test:
   - This will implement the indirect front-end on a small 30-frame sample of the TUM Freiburg2 dataset (freiburg2.mat), and jointly optimize using the back-end joint_optimization.m
   - This will also output a keys.mat file that the direct front-end will read when it is run to determine which loop closures were found by the indirect front-end.
   - This will also plot some results of the indirect front-end method.
+- Run direct_main.m
+  - This will use the loop closure info from the indirect front-end and plot results of the direct front-end (using the same back-end joint_optimization.m)
