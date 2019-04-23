@@ -366,6 +366,10 @@ if __name__ == '__main__':
     else:
         print(numpy.mean(trans_error))
 
+    # out save
+    xy = numpy.concatenate(((stamps - stamps[0]).reshape((len(stamps),1)), trans_error.reshape((len(stamps),1))), axis=1)
+    numpy.save("error", xy)
+
     if args.plot:    
         import matplotlib
         matplotlib.use('Agg')
