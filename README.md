@@ -2,4 +2,7 @@ This repository includes code to compare the performance of two different approa
 
 How to run a simple test:
 - Navigate to the test/ folder
-- 
+- Run indirect_main.m
+  - This will implement the indirect front-end on a small 30-frame sample of the TUM Freiburg2 dataset (freiburg2.mat), and jointly optimize using the back-end joint_optimization.m
+  - This will also output a keys.mat file that the direct front-end will read when it is run to determine which loop closures were found by the indirect front-end.
+  - This will also plot some results of the indirect front-end method.
