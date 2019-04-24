@@ -2,6 +2,8 @@ clc, clear, close all;
 global poses;
 global window
 
+addpath('./util')
+
 % This will now be a dynamic variable.
 max_num_keyframes = 30;
 
@@ -149,7 +151,6 @@ end
 % Get trajectory
 est_traj = zeros(length(window.kframe_indices), 3);
 for j = 1:length(window.kframe_indices)
-    poses{j}
     pt = poses{j} * [0; 0; 0; 1];
     est_traj(j, :) = pt(1:3)';
 end
