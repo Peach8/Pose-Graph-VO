@@ -154,7 +154,7 @@ for j = 1:length(window.kframe_indices)
     est_traj(j, :) = pt(1:3)';
 end
 
-% save('keys.mat')
+save('keys.mat')
 
 disp("DONE")
 
