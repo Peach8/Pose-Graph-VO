@@ -3,17 +3,17 @@ This repository includes code to compare the performance of two different approa
 # How to run a simple test:
 
 ## 1. Path setting
-- Set your path at `./RGB-D_DSO)`
+- Set your path at `./RGB-D_DSO`
 - Add all the subfolders in `./RGB-D_DSO` to your path.
 
 ## 2. Indirect Method
-- Run `./indirect/indirect_main.m`
+- Run `./test/indirect_main.m`
   - This will implement the indirect front-end on a small 30-frame sample of the TUM Freiburg2 dataset (`freiburg2.mat`), and jointly optimize using the back-end `joint_optimization.m`
   - This will also output a keys.mat file that the direct front-end will read when it is run to determine which loop closures were found by the indirect front-end.
   - This will also plot some results of the indirect front-end method.
 
 ## 3. Direct Method
-- Run `./direct/direct_main.m`
+- Run `./test/direct_main.m`
   - This will use the loop closure info from the indirect front-end and generate alignment results of the direct front-end (using the same back-end joint_optimization.m)
   - You can visualize the process of alignment by uncomment line 231-233 in `./direct/@rgbd_dvo/rgbd_dvo.m`
 
