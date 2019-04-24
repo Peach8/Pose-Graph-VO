@@ -1,29 +1,26 @@
-%% load point cloud
-% clear; close all
+%% load data
+% Demo: 30-batch test
+clear; close all
 
-% load key information
-% kframe_idx = load('kframe_indices_50_keyframes.mat');
-% kframe_idx = kframeindices;
-% KEYS = cell(1,1);
-% KEY = load('testkeys.mat');
-% KEY = KEY.KEYS;
-KEYS{1} = allkey{1};
-% KEY = KEY.keys;
+% load keyframe information
+% In 30-batch test, kframe indices are the first 30, so we don't need it 
+% kframe_idx = load('kframe_indices.mat');
 
-% KEYS = allkey(1:86);
+% load keys
+KEY = load('./test/keys.mat');
+KEY = KEY.keys;
+KEYS{1} = KEY;
 
 % % load and process data
-% freiburg2 = load('freiburg2.mat');
-% freiburg2 = freiburg2.freiburg2;
-% freiburg2 = freiburg2(kfindiceswindow80);
-freiburg2 = freiburg2(1:80);
+freiburg2 = load('./test/freiburg2.mat');
+freiburg2 = freiburg2.freiburg;
 
 
 %%
 % init 
 
 % N = window size
-N = 80;
+N = 30;
 
 POSE = cell(length(freiburg2),1);
 POSE{1} = eye(4);

@@ -3,24 +3,24 @@ This repository includes code to compare the performance of two different approa
 # How to run a simple test:
 
 ## 1. Path setting
-- Set your path at ./RGB-D_DSO
-- Add all the subfolders in RGB-D_DSO to your path.
+- Set your path at `./RGB-D_DSO)`
+- Add all the subfolders in `./RGB-D_DSO` to your path.
 
 ## 2. Indirect Method
-- Run ./indirect/indirect_main.m
-  - This will implement the indirect front-end on a small 30-frame sample of the TUM Freiburg2 dataset (freiburg2.mat), and jointly optimize using the back-end joint_optimization.m
+- Run `./indirect/indirect_main.m`
+  - This will implement the indirect front-end on a small 30-frame sample of the TUM Freiburg2 dataset (`freiburg2.mat`), and jointly optimize using the back-end `joint_optimization.m`
   - This will also output a keys.mat file that the direct front-end will read when it is run to determine which loop closures were found by the indirect front-end.
   - This will also plot some results of the indirect front-end method.
 
 ## 3. Direct Method
-- Run ./direct/direct_main.m
+- Run `./direct/direct_main.m`
   - This will use the loop closure info from the indirect front-end and generate alignment results of the direct front-end (using the same back-end joint_optimization.m)
-  - You can visualize the process of alignment by uncomment line 231-233 in ./direct/@rgbd_dvo/rgbd_dvo.m
+  - You can visualize the process of alignment by uncomment line 231-233 in `./direct/@rgbd_dvo/rgbd_dvo.m`
 
 # How to evaluate your result with ground truth:
 - After run through direct_main.m or indirect_main.m, store your coordinate variable as a mat file. It will be used to generate a trajectory file in the next step.
-- Run ./gen_traj_txt.m and enter the name of the txt file in line 17.
-- To generate a RPE (relative pose error) plot, run ./compare_traj/evaluate_rpe.py freiburg2_gt.txt (your_traj_txt_name).txt --fixed_delta --plot (Plot_you_want_to_name_as)
+- Run `./gen_traj_txt.m` and enter the name of the txt file in line 17.
+- To generate a RPE (relative pose error) plot, run `./compare_traj/evaluate_rpe.py freiburg2_gt.txt (your_traj_txt_name).txt --fixed_delta --plot (Plot_you_want_to_name_as)`
 
 # References
 - Steinbrücker, F., Sturm, J., & Cremers, D. (2011, November). Real-time visual dometry from dense RGB-D images. In 2011 IEEE International Conference on Computer Vision Workshops (ICCV Workshops) (pp. 719-722). IEEE.
