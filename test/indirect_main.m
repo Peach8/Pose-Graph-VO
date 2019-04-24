@@ -15,7 +15,7 @@ global poses;
 global window
 
 % This will now be a dynamic variable.
-max_num_keyframes = 5;
+max_num_keyframes = 30;
 
 % Holds a cell array of frame structs
 window.keyframes = cell(1, max_num_keyframes);
@@ -37,7 +37,7 @@ window.flowThresh = 0.2;
 % between keyframes
 
 %window.minNumMatches = 120;
-window.minNumMatches = 120;
+window.minNumMatches = 500;
 window.connectionThresh = 80;
 
 window.minimum = 400;
