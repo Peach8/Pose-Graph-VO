@@ -2,8 +2,6 @@ clc, clear, close all;
 global poses;
 global window
 
-addpath('./util')
-
 % This will now be a dynamic variable.
 max_num_keyframes = 30;
 
